@@ -1,10 +1,10 @@
 from static_array import Array
 from py_linq import Enumerable
 from typing import Generic, TypeVar
-import pathos.multiprocessing as multiprocessing
-
-
-pool = multiprocessing.Pool(multiprocessing.cpu_count())
+# import pathos.multiprocessing as multiprocessing
+#
+#
+# pool = multiprocessing.Pool(multiprocessing.cpu_count())
 
 
 T = TypeVar('T')

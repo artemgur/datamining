@@ -94,7 +94,7 @@ def to_sorted_tuples(matrix: Matrix, unique_links: list[str]):
         result.append((matrix[x][0], unique_links[x]))
     return sorted(result, key=lambda x: x[0])
 
-def write_tuple(rank: float, name: str):
+def __write_tuple(rank: float, name: str):
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
     cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', rank, name)
@@ -114,7 +114,7 @@ def __write_results_to_database(vector: Matrix, unique_links: list[str]):
     __postgres_pool.putconn(conn)
     list_of_tuples = [(vector.get(i, 0), unique_links[i]) for i in range(len(unique_links))]
     with concurrent.futures.ThreadPoolExecutor(8) as pool:
-        pool.map(lambda x: __write_results_to_database(x[0], x[1]), list_of_tuples)
+        pool.map(lambda x: __write_tuple(x[0], x[1]), list_of_tuples)
 
 
 
