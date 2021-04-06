@@ -7,8 +7,8 @@ from psycopg2.pool import ThreadedConnectionPool
 
 connection_parameters = {
     'user': 'postgres',
-    'password': 'postgres',
-    'host': 'localhost',
+    'password': 'dmcourse13',
+    'host': 'datamining-db.ckzuyvzulw2u.us-east-1.rds.amazonaws.com',
     'port': 5432,
     'database': 'postgres'
 }
