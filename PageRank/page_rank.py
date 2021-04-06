@@ -3,10 +3,12 @@ import static_array
 from matrix import Matrix
 from crawler import connection_parameters
 from py_linq import Enumerable
+#import multiprocessed_matrix_multiplier
+import concurrent.futures
 
 
 __postgres_pool = ThreadedConnectionPool(1, 10, **connection_parameters)
-__iterations = 20
+__iterations = 5
 __dumping_factor = 0.85
 
 
@@ -54,14 +56,16 @@ def __set_transition_probabilities(matrix: Matrix):
             matrix[i][c] = probability
 
 
-def run():
-    matrix = build_transition_matrix()[0]
+def run() -> (Matrix, list[str]):
+    matrix, unique_links = build_transition_matrix()
     n = matrix.rows
     vector = __create_vector_from_value(1 / n, n)
     dumping_vector = __create_vector_from_value((1 - __dumping_factor) / n, n)
     for i in range(__iterations):
+        print(i)
         vector = __run_iteration(vector, matrix, dumping_vector)
-    return vector
+    __write_results_to_database(vector, unique_links)
+    return vector, unique_links
 
 
 def __create_vector_from_value(value, n: int):
@@ -82,4 +86,35 @@ def get_original_link() -> str:
     result = cursor.fetchall()[0][0]
     __postgres_pool.putconn(conn)
     return result
+
+
+def to_sorted_tuples(matrix: Matrix, unique_links: list[str]):
+    result:list[(float, str)] = []
+    for x in range(matrix.rows):
+        result.append((matrix[x][0], unique_links[x]))
+    return sorted(result, key=lambda x: x[0])
+
+def write_tuple(rank: float, name: str):
+    conn = __postgres_pool.getconn()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', rank, name)
+    conn.commit()
+    __postgres_pool.putconn(conn)
+
+
+def __write_results_to_database(vector: Matrix, unique_links: list[str]):
+    conn = __postgres_pool.getconn()
+    cursor = conn.cursor()
+    cursor.execute(\
+    '''CREATE TABLE IF NOT EXISTS page_rank(
+    value FLOAT,
+    url TEXT)''')
+    cursor.execute('TRUNCATE TABLE page_rank')
+    conn.commit()
+    __postgres_pool.putconn(conn)
+    list_of_tuples = [(vector.get(i, 0), unique_links[i]) for i in range(len(unique_links))]
+    with concurrent.futures.ThreadPoolExecutor(8) as pool:
+        pool.map(lambda x: __write_results_to_database(x[0], x[1]), list_of_tuples)
+
+
 

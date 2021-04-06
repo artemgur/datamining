@@ -1,6 +1,11 @@
 from static_array import Array
 from py_linq import Enumerable
 from typing import Generic, TypeVar
+import pathos.multiprocessing as multiprocessing
+
+
+pool = multiprocessing.Pool(multiprocessing.cpu_count())
+
 
 T = TypeVar('T')
 
@@ -58,3 +63,35 @@ class Matrix(Generic[T]):
 
     def __str__(self):
         return Enumerable(self.__rows_array).select(lambda x: str(x)).aggregate(lambda aggr, element: aggr + '\n' + element)
+
+    # def __row_submatrix(self, first_row: int, last_row: int) -> 'Matrix':
+    #     result = Matrix(last_row - first_row + 1, self.columns)
+    #     for x in range(first_row, last_row):
+    #         result.__rows_array[x - first_row] = self.__rows_array[x]
+    #     return result
+
+    # def __concat_matrixes(self, b:'Matrix') -> 'Matrix':
+    #     if self.columns != b.columns:
+    #         raise ValueError("Can't concat matrixes, because they have different number of columns")
+    #     for x in range(b.rows):
+    #         self.__rows_array._StaticArray__list.append(b.__rows_array[x])
+    #     self.__rows_array._StaticArray__length += b.rows
+    #     return self
+    #
+    # def __multiply_partial(self, b:'Matrix', first_row: int, last_row: int) -> 'Matrix':
+    #     result = Matrix(last_row - first_row + 1, b.columns)
+    #     for r in range(first_row, last_row):
+    #         for c in range(b.columns):
+    #             cell_value = 0
+    #             for i in range(self.columns):
+    #                 cell_value += self.get(r, i) * b.get(i, c)
+    #             result.set(r - first_row, c, cell_value)
+    #     return result
+    #
+    # def multiply_multiprocessed(self, b: 'Matrix') -> 'Matrix':
+    #     step = self.rows // multiprocessing.cpu_count()
+    #     tuples = Enumerable(range(self.rows)).select(lambda x: (step * x, step * (x + 1))).to_list()
+    #     last_tuple = tuples[len(tuples) - 1]
+    #     tuples[len(tuples) - 1] = (last_tuple[0], self.rows - 1)
+    #     pool_result = pool.map(lambda x: self.__multiply_partial(b, x[0], x[1]), tuples)
+    #     return Enumerable(pool_result).aggregate(lambda aggr, new: aggr.__concat_matrixes(new))
