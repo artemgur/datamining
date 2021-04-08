@@ -99,7 +99,7 @@ def __write_tuple(rank: float, name: str):
     print(f'Writing url {name} with page rank {rank}')
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', rank, name)
+    cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', (rank, name))
     conn.commit()
     __postgres_pool.putconn(conn)
 
