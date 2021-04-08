@@ -96,7 +96,6 @@ def to_sorted_tuples(matrix: Matrix, unique_links: list[str]):
 
 
 def __write_tuple(rank: float, name: str):
-    print(f'Writing url {name} with page rank {rank}')
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
     cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', (rank, name))
