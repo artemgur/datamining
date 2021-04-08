@@ -8,7 +8,7 @@ import concurrent.futures
 
 
 __postgres_pool = ThreadedConnectionPool(1, 10, **connection_parameters)
-__iterations = 5
+__iterations = 1
 __dumping_factor = 0.85
 
 
@@ -62,7 +62,7 @@ def run() -> (Matrix, list[str]):
     vector = __create_vector_from_value(1 / n, n)
     dumping_vector = __create_vector_from_value((1 - __dumping_factor) / n, n)
     for i in range(__iterations):
-        print(i)
+        print(f'Iteration {i} running')
         vector = __run_iteration(vector, matrix, dumping_vector)
     __write_results_to_database(vector, unique_links)
     return vector, unique_links
@@ -94,7 +94,9 @@ def to_sorted_tuples(matrix: Matrix, unique_links: list[str]):
         result.append((matrix[x][0], unique_links[x]))
     return sorted(result, key=lambda x: x[0])
 
+
 def __write_tuple(rank: float, name: str):
+    print(f'Writing url {name} with page rank {rank}')
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
     cursor.execute('INSERT INTO page_rank VALUES (%s, %s)', rank, name)
@@ -103,6 +105,7 @@ def __write_tuple(rank: float, name: str):
 
 
 def __write_results_to_database(vector: Matrix, unique_links: list[str]):
+    print('Started writing results to database')
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
     cursor.execute(\
