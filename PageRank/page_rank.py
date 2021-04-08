@@ -8,7 +8,7 @@ import concurrent.futures
 
 
 __postgres_pool = ThreadedConnectionPool(1, 10, **connection_parameters)
-__iterations = 1
+__iterations = 10
 __dumping_factor = 0.85
 
 
