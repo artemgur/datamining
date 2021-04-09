@@ -21,6 +21,7 @@ __original_link: str
 
 
 def run(url: str, iteration: int):
+    print('Crawler running!')
     __prepare_table()
     global __processed_links  # , dead_end_links
     __processed_links = set()
