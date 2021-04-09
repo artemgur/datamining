@@ -17,6 +17,7 @@ def build_transition_matrix() -> (Matrix, list[str]):
 
     :return:Tuple: (<transition matrix>, <list of links in transition matrix in the same order>)
     """
+    print('Started building transition matrix')
     conn = __postgres_pool.getconn()
     cursor = conn.cursor()
     original_link = get_original_link()
@@ -32,6 +33,7 @@ def build_transition_matrix() -> (Matrix, list[str]):
         result[i] = row
     __postgres_pool.putconn(conn)
     __set_transition_probabilities(result)
+    print('Building transition matrix finished')
     return result, unique_links
 
 
