@@ -121,4 +121,28 @@ def __write_results_to_database(vector: Matrix, unique_links: list[str]):
         pool.map(lambda x: __write_tuple(x[0], x[1]), list_of_tuples)
 
 
+def __write_unique_link(number: int, link: str):
+    conn = __postgres_pool.getconn()
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO unique_links VALUES (%s, %s)', (number, link))
+    conn.commit()
+    __postgres_pool.putconn(conn)
+
+
+def write_unique_links_to_database(unique_links: list[str]):
+    print('Started writing unique links to database')
+    conn = __postgres_pool.getconn()
+    cursor = conn.cursor()
+    cursor.execute(\
+    '''CREATE TABLE IF NOT EXISTS unique_links(
+    id INT,
+    url TEXT)''')
+    cursor.execute('TRUNCATE TABLE unique_links')
+    conn.commit()
+    __postgres_pool.putconn(conn)
+    list_of_tuples = [(i, unique_links[i]) for i in range(len(unique_links))]
+    with concurrent.futures.ThreadPoolExecutor(8) as pool:
+        pool.map(lambda x: __write_unique_link(x[0], x[1]), list_of_tuples)
+
+
 
