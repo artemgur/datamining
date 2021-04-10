@@ -27,7 +27,7 @@ def run():
     graph.add_edges_from(edges)
     print('Drawing graph')
     matplotlib.pyplot.figure(1, figsize=(100,100))
-    networkx.draw_networkx(graph, arrows=True, node_size = 10, font_size = 6, with_labels=True)
+    networkx.draw(graph, arrows=True, node_size = 10, font_size = 6, with_labels=True)
     # matplotlib.pyplot.show()
     print('Saving file')
     matplotlib.pyplot.savefig("Graph.png", format="PNG")
