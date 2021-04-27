@@ -4,8 +4,10 @@ import ams
 import stream_element_counter
 import loglog
 import hash_functions
+import sys
 
-__element_number = -1
+handled_elements = 0
+server: 'Handler'
 moment_0 = 0
 moment_1 = stream_generator.numbers_count  # we need to know count of numbers for AMS algorithm anyway
 moment_2 = 0
@@ -19,23 +21,34 @@ loglog_sha256 = loglog.LogLog(hash_functions.sha256)
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         self.send_response(200)
+        self.end_headers()
         content_length = int(self.headers['Content-Length'])
-        received_number = int(self.rfile.read(content_length).decode('utf-8'))
+        content = self.rfile.read(content_length).decode('utf-8')
+        #print(content)
+        received_number = int(content)
+        print(f"Server received number {received_number}")
         self.__handle(received_number)
+
+    # def do_GET(self):
+    #     self.send_response(200)
 
     @staticmethod
     def __handle(number: int):
-        global moment_0, moment_2, __element_number
-        __element_number += 1
+        global moment_0, moment_2, handled_elements
+        handled_elements += 1
         precise_counter.add_element(number)
         loglog_md5.process(number)
         loglog_sha256.process(number)
         # moment_1 += 1 # 1st moment is equal to count of all elements of stream
-        ams_list_100.handle_item(__element_number, number)
-        ams_list_500.handle_item(__element_number, number)
+        ams_list_100.handle_item(handled_elements, number)
+        ams_list_500.handle_item(handled_elements, number)
+        print(f'Current element number: {handled_elements}')
+        if handled_elements >= stream_generator.numbers_count:
+            Handler.__finalize()
 
     @staticmethod
-    def __output_results():
+    def __finalize():
+        server.server_close();
         print('0th moment (count of distinct elements):')
         print(f'Precise: {precise_counter.number_of_distinct()}')
         print(f'LogLog (MD5): {loglog_md5.get_result()}')
@@ -46,8 +59,12 @@ class Handler(BaseHTTPRequestHandler):
         print(f'Precise: {precise_counter.moment_2()}')
         print(f'AMS algorithm (100 variables): {ams_list_100.calculate_estimation()}')
         print(f'AMS algorithm (500 variables): {ams_list_500.calculate_estimation()}')
+        sys.exit(0)
 
 
 def start_handler():
-    with HTTPServer(('', 8000), Handler) as server:
-        server.serve_forever()
+    print('Starting server...')
+    global server
+    server = HTTPServer(('127.0.0.1', 8000), Handler)
+    # with HTTPServer(('127.0.0.1', 8000), Handler) as server:
+    server.serve_forever()

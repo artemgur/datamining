@@ -1,5 +1,4 @@
 from typing import Callable
-import hashlib
 
 
 class LogLog:
@@ -9,37 +8,39 @@ class LogLog:
 
     def process(self, value):
         result = self.__hash_function(value)
-        trailing_zeroes = get_trailing_zeroes_count_hex(result)
+        trailing_zeroes = LogLog.__get_trailing_zeroes_count_hex(result)
         if trailing_zeroes > self.__max_zeroes:
             self.__max_zeroes = trailing_zeroes
 
     def get_result(self) -> int:
-        return self.__max_zeroes
+        return 2**self.__max_zeroes
+
+    @staticmethod
+    def __get_trailing_zeroes_count_hex(hex: str) -> int:
+        position = len(hex) - 1
+        counter = 0
+        while True:
+            if position == -1:
+                return counter
+            elif hex[position] == '0':
+                counter += 4
+                position -= 1
+                continue
+            elif hex[position] in {'2', '6', 'a', 'e'}:
+                return counter + 1
+            elif hex[position] in {'4', 'c'}:
+                return counter + 2
+            elif hex[position] in {'8'}:
+                return counter + 3
+            else:
+                return counter
+
+    # @staticmethod
+    # def __get_trailing_zeroes_count_dec(number: int) -> int:
+    #     counter = 0
+    #     while number % 2 == 0:
+    #         number = number // 2
+    #         counter += 1
+    #     return counter
 
 
-def get_trailing_zeroes_count_dec(number: int) -> int:
-    counter = 0
-    while number % 2 == 0:
-        number = number // 2
-        counter += 1
-    return counter
-
-
-def get_trailing_zeroes_count_hex(hex: str) -> int:
-    position = len(hex) - 1
-    counter = 0
-    while True:
-        if position == -1:
-            return counter
-        elif hex[position] == '0':
-            counter += 4
-            position -= 1
-            continue
-        elif hex[position] in {'2', '6', 'a', 'e'}:
-            return counter + 1
-        elif hex[position] in {'4', 'c'}:
-            return counter + 2
-        elif hex[position] in {'8'}:
-            return counter + 3
-        else:
-            return counter
