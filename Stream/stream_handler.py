@@ -16,6 +16,7 @@ ams_list_500 = ams.AMS(500, stream_generator.numbers_count)
 precise_counter = stream_element_counter.StreamElementCounter()
 loglog_md5 = loglog.LogLog(hash_functions.md5)
 loglog_sha256 = loglog.LogLog(hash_functions.sha256)
+loglog_linear = loglog.LogLog(hash_functions.linear)
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -39,6 +40,7 @@ class Handler(BaseHTTPRequestHandler):
         precise_counter.add_element(number)
         loglog_md5.process(number)
         loglog_sha256.process(number)
+        loglog_linear.process(number)
         # moment_1 += 1 # 1st moment is equal to count of all elements of stream
         ams_list_100.handle_item(handled_elements, number)
         ams_list_500.handle_item(handled_elements, number)
@@ -48,18 +50,20 @@ class Handler(BaseHTTPRequestHandler):
 
     @staticmethod
     def __finalize():
-        server.server_close();
-        print('0th moment (count of distinct elements):')
-        print(f'Precise: {precise_counter.number_of_distinct()}')
-        print(f'LogLog (MD5): {loglog_md5.get_result()}')
-        print(f'LogLog (SHA256): {loglog_sha256.get_result()}')
-        print('1st moment (count of elements):')
-        print(moment_1)
-        print('2nd moment:')
-        print(f'Precise: {precise_counter.moment_2()}')
-        print(f'AMS algorithm (100 variables): {ams_list_100.calculate_estimation()}')
-        print(f'AMS algorithm (500 variables): {ams_list_500.calculate_estimation()}')
-        sys.exit(0)
+        server.server_close()
+        with open('results.txt', 'a') as f:
+            print('0th moment (count of distinct elements):', file=f)
+            print(f'Precise: {precise_counter.number_of_distinct()}', file=f)
+            print(f'LogLog (MD5): {loglog_md5.get_result()}', file=f)
+            print(f'LogLog (SHA256): {loglog_sha256.get_result()}', file=f)
+            print(f'LogLog (linear function): {loglog_linear.get_result()}', file=f)
+            print('1st moment (count of elements):', file=f)
+            print(moment_1, file=f)
+            print('2nd moment:', file=f)
+            print(f'Precise: {precise_counter.moment_2()}', file=f)
+            print(f'AMS algorithm (100 variables): {ams_list_100.calculate_estimation()}', file=f)
+            print(f'AMS algorithm (500 variables): {ams_list_500.calculate_estimation()}', file=f)
+            sys.exit(0)
 
 
 def start_handler():
