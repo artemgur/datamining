@@ -5,6 +5,7 @@ import stream_element_counter
 import loglog
 import hash_functions
 import sys
+import time
 
 handled_elements = 0
 server: 'Handler'
@@ -17,10 +18,13 @@ precise_counter = stream_element_counter.StreamElementCounter()
 loglog_md5 = loglog.LogLog(hash_functions.md5)
 loglog_sha256 = loglog.LogLog(hash_functions.sha256)
 loglog_linear = loglog.LogLog(hash_functions.linear)
+t = 0
 
 
 class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
+        global t
+        t = time.perf_counter()
         self.send_response(200)
         self.end_headers()
         content_length = int(self.headers['Content-Length'])
@@ -29,6 +33,7 @@ class Handler(BaseHTTPRequestHandler):
         received_number = int(content)
         print(f"Server received number {received_number}")
         self.__handle(received_number)
+        print(time.perf_counter() - t)
 
     # def do_GET(self):
     #     self.send_response(200)

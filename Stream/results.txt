@@ -1,0 +1,76 @@
+0th moment (count of distinct elements):
+Precise: 645
+LogLog (MD5): 512
+LogLog (SHA256): 512
+1st moment (count of elements):
+1000
+2nd moment:
+Precise: 1932
+AMS algorithm (100 variables): 1860.0
+AMS algorithm (500 variables): 1972.0
+0th moment (count of distinct elements):
+Precise: 634
+LogLog (MD5): 512
+LogLog (SHA256): 256
+LogLog (linear function): 256
+1st moment (count of elements):
+1000
+2nd moment:
+Precise: 1962
+AMS algorithm (100 variables): 1720.0
+AMS algorithm (500 variables): 1976.0
+0th moment (count of distinct elements):
+Precise: 1001
+LogLog (MD5): 512
+LogLog (SHA256): 512
+LogLog (linear function): 512
+1st moment (count of elements):
+10000
+2nd moment:
+Precise: 109630
+AMS algorithm (100 variables): 27800.0
+AMS algorithm (500 variables): 32720.0
+0th moment (count of distinct elements):
+Precise: 633
+LogLog (MD5): 512
+LogLog (SHA256): 512
+LogLog (linear function): 512
+1st moment (count of elements):
+1000
+2nd moment:
+Precise: 1982
+AMS algorithm (100 variables): 1820.0
+AMS algorithm (500 variables): 0.0
+0th moment (count of distinct elements):
+Precise: 996
+LogLog (MD5): 512
+LogLog (SHA256): 512
+LogLog (linear function): 512
+1st moment (count of elements):
+5000
+2nd moment:
+Precise: 29858
+AMS algorithm (100 variables): 13900.0
+AMS algorithm (500 variables): 12180.0
+0th moment (count of distinct elements):
+Precise: 949
+LogLog (MD5): 512
+LogLog (SHA256): 512
+LogLog (linear function): 512
+1st moment (count of elements):
+3000
+2nd moment:
+Precise: 11966
+AMS algorithm (100 variables): 8400.0
+AMS algorithm (500 variables): 8136.0
+0th moment (count of distinct elements):
+Precise: 1001
+LogLog (MD5): 512
+LogLog (SHA256): 512
+LogLog (linear function): 512
+1st moment (count of elements):
+1000000
+2nd moment:
+Precise: 1000001990
+AMS algorithm (100 variables): 1000000.0
+AMS algorithm (500 variables): 4856000.0

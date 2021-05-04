@@ -5,7 +5,7 @@ import time
 numbers_count = 1000000
 __min_number = 0
 __max_number = 1000
-__time_between_numbers = 0.2
+__time_between_numbers = 0.001
 
 
 def generate():
