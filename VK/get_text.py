@@ -10,4 +10,5 @@ def get_text(offset: int):
     response_json = requests.get(
         f'https://api.vk.com/method/wall.get?access_token={ACCESS_TOKEN}&v=5.52&owner_id={GROUP_ID}&count=1&offset={offset}').text
     parsed = json.loads(response_json)
+    print(parsed)
     return str(parsed['response']['items'][0]['text'])
