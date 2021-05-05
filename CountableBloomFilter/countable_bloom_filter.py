@@ -1,54 +1,59 @@
 from typing import TypeVar, Generic, Callable
-from py_linq import Enumerable
+# from py_linq import Enumerable
 import math
 
 T = TypeVar('T')
 
-def _sum_lists(a: list[int], b: list[int]) -> list[int]:
-    return Enumerable(a).zip(Enumerable(b), lambda x, y: x + y).to_list()
+# def _sum_lists(a: list[int], b: list[int]) -> list[int]:
+#     return Enumerable(a).zip(Enumerable(b), lambda x, y: x + y).to_list()
 
-def _or_lists(a: list[int], b: list[int]) -> list[int]:
-    return Enumerable(a).zip(Enumerable(b), lambda x, y: _or(x, y)).to_list()
+# def _or_lists(a: list[int], b: list[int]) -> list[int]:
+#     return Enumerable(a).zip(Enumerable(b), lambda x, y: _or(x, y)).to_list()
 
-def _subtract_list(a: list[int], b: list[int]) -> list[int]:
-    return Enumerable(a).zip(Enumerable(b), lambda x, y: x - y).to_list()
+# def _subtract_list(a: list[int], b: list[int]) -> list[int]:
+#     return Enumerable(a).zip(Enumerable(b), lambda x, y: x - y).to_list()
 
-def _or(a: int, b: int):
-    return a != 0 or b != 0
+# def _or(a: int, b: int):
+#     return a != 0 or b != 0
 
-def _implication(a: int, b: int):
-    return a == 0 or b != 0
+# def _implication(a: int, b: int):
+#     return a == 0 or b != 0
 
 class CountableBloomFilter(Generic[T]):
-    def __init__(self, length: int, *args: Callable[[T], str]):
+    def __init__(self, length: int, *args: Callable[[T], int]):
         if len(args) == 0:
             raise ValueError("Can't create countable bloom filter without hash functions")
         self.__hash_functions = args
         self.__bloom_filter = [0] * length
         self.__elements_count = 0
 
-    def __hash_element(self, element: T) -> list[int]:
-        return Enumerable(self.__hash_functions).select(
-            lambda x: _string_to_char_list(x(element), len(self.__bloom_filter))).aggregate(lambda x, y: _or_lists(x, y))
+    def __hash_element(self, element: T) -> set[int]:
+        return set(map(lambda x: x(element) % len(self.__hash_functions), self.__hash_functions))
 
     def add(self, element: T):
-        self.__elements_count += 1
-        self.__bloom_filter = _sum_lists(self.__bloom_filter, self.__hash_element(element))
+        for i in self.__hash_element(element):
+            self.__bloom_filter[i] += 1
 
     def remove(self, element: T):
-        self.__elements_count -= 1
-        self.__bloom_filter = _subtract_list(self.__bloom_filter, self.__hash_element(element))
+        for i in self.__hash_element(element):
+            self.__bloom_filter[i] -= 1
 
     def contains(self, element: T) -> bool:
-        return Enumerable(self.__hash_element(element)).zip(self.__bloom_filter, lambda x, y: (x, y)).all(lambda x: _implication(x[0], x[1]))
+        for i in self.__hash_element(element):
+            if self.__bloom_filter[i] == 0:
+                return False
+        return True
 
     def get_false_positive_probability(self):
         return (1 - math.exp(-len(self.__hash_functions) * self.__elements_count / len(self.__bloom_filter))) ** len(self.__hash_functions)
 
-def _string_to_char_list(string: str, max_length: int):
-    string_list = []
-    string_list[0:max_length] = string # Supposed to convert string to the list of characters https://www.geeksforgeeks.org/python-splitting-string-to-list-of-characters/
-    return string_list
+def optimal_hash_functions_count(length: int, false_positive_probability: float, expected_elements_count: int) -> int:
+    return round(math.log(2) * length / expected_elements_count)
+
+# def _string_to_char_list(string: str, max_length: int):
+#     string_list = []
+#     string_list[0:max_length] = string # Supposed to convert string to the list of characters https://www.geeksforgeeks.org/python-splitting-string-to-list-of-characters/
+#     return string_list
 
 # __hex_chars_dictionary = {'0': [0, 0, 0, 0], '1': [0, 0, 0, 1], '2': [0, 0, 1, 0], '3': [0, 0, 1, 1],
 #                           '4': [0, 1, 0, 0], '5': [0, 1, 0, 1], '6': [0, 1, 1, 0], '7': [0, 1, 1, 1],

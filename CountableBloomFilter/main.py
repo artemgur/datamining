@@ -1,3 +1,11 @@
-import countable_bloom_filter
+import cbf_creator
+import database
 
-countable_bloom_filter.CountableBloomFilter(10, lambda x: str(x)).add(1)
+words = database.get_words()
+cbf = cbf_creator.create_optimal(0.0001, 4000)
+for word in words:
+    cbf.add(word)
+print(cbf.get_false_positive_probability())
+while True:
+    word = input()
+    print(cbf.contains(word))
